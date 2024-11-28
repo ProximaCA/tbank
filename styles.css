@@ -1,0 +1,29 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #000;
+}
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.screen {
+  width: 100%;
+  display: none;
+}
+
+.screen img {
+  width: 100%;
+  height: auto;
+}
+
+/* Показываем только активный экран */
+.screen.active {
+  display: block;
+}

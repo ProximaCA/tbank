@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Т-Банк</title>
+    <link rel="icon" href="LOGO.PNG" type="image/x-icon">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="app">
+        <!-- Экран логина -->
+        <div class="screen active" id="login">
+            <img src="PAVEL_LOGIN.JPG" alt="Экран логина">
+        </div>
+
+        <!-- Экран успешного логина -->
+        <div class="screen" id="login-success">
+            <img src="PAVEL_LOGIN.JPG" alt="Успешный вход">
+        </div>
+
+        <!-- Главная -->
+        <div class="screen" id="main">
+            <img src="PAVEL_HOME.JPG" alt="Главный экран">
+        </div>
+
+        <!-- Главная (скролл) -->
+        <div class="screen" id="main-scroll">
+            <img src="PAVEL_HOME_SCOLL.JPG" alt="Главный экран скролл">
+        </div>
+
+        <!-- Карта -->
+        <div class="screen" id="card">
+            <img src="PAVEL_CARD.JPG" alt="Экран карты">
+        </div>
+
+        <!-- Назад (главная) -->
+        <div class="screen" id="back">
+            <img src="PAVEL_CARD_SETINGS.JPG" alt="Вниз">
+        </div>
+
+        <!-- Еще -->
+        <div class="screen" id="more">
+            <img src="PAVEL_MORE.JPG" alt="Экран еще">
+        </div>
+    </div>
+
+    <script>
+        // Функция для показа нужного экрана
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // Начальная последовательность логина
+        setTimeout(() => {
+            showScreen('login-success');
+            setTimeout(() => {
+                showScreen('main');
+                initializeMainLogic(); // Запускаем основную логику после входа
+            }, 1000);
+        }, 2000);
+
+        // Основная логика навигации
+        function initializeMainLogic() {
+            let lastScrollTop = 0;
+            let isScrolling = false;
+
+            // Обработчик для главного экрана
+            document.getElementById('main').addEventListener('click', () => {
+                showScreen('card');
+            });
+
+            // Обработчик скролла для главного экрана и прокрученного главного экрана
+            document.addEventListener('scroll', () => {
+                let st = window.pageYOffset || document.documentElement.scrollTop;
+
+                // Для главного экрана (скролл вниз)
+                if (document.getElementById('main').classList.contains('active') && !isScrolling) {
+                    if (st > lastScrollTop) {
+                        isScrolling = true;
+                        showScreen('main-scroll');
+                        setTimeout(() => { isScrolling = false; }, 500);
+                    }
+                }
+
+                // Для прокрученного главного экрана (скролл вверх)
+                if (document.getElementById('main-scroll').classList.contains('active') && !isScrolling) {
+                    if (st < lastScrollTop) {
+                        isScrolling = true;
+                        showScreen('main');
+                        setTimeout(() => { isScrolling = false; }, 500);
+                    }
+                }
+
+                // Для экрана карты
+                if (document.getElementById('card').classList.contains('active') && !isScrolling) {
+                    if (st > lastScrollTop) {
+                        isScrolling = true;
+                        showScreen('back');
+                        setTimeout(() => { isScrolling = false; }, 500);
+                    }
+                }
+
+                lastScrollTop = st <= 0 ? 0 : st;
+            });
+
+            // Обработчик для прокрученного главного экрана
+            document.getElementById('main-scroll').addEventListener('click', () => {
+                showScreen('card');
+            });
+
+            // Обработчик для экрана настроек
+            document.getElementById('back').addEventListener('click', () => {
+                showScreen('more');
+            });
+
+            // Обработчик для экрана "еще"
+            document.getElementById('more').addEventListener('click', () => {
+                showScreen('main');
+            });
+
+            // Обновленные touch-события
+            let touchStartY = 0;
+            document.addEventListener('touchstart', (e) => {
+                touchStartY = e.touches[0].clientY;
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                let touchEndY = e.touches[0].clientY;
+                let touchDiff = touchStartY - touchEndY;
+
+                if (document.getElementById('main').classList.contains('active')) {
+                    if (touchDiff > 50) { // Свайп вниз
+                        showScreen('main-scroll');
+                    }
+                }
+                else if (document.getElementById('main-scroll').classList.contains('active')) {
+                    if (touchDiff < -50) { // Свайп вверх
+                        showScreen('main');
+                    }
+                }
+                else if (document.getElementById('card').classList.contains('active')) {
+                    if (touchDiff > 50) {
+                        showScreen('back');
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
